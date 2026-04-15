@@ -213,83 +213,124 @@ nav.navbar {
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        $('#searchForm').submit(function(e) {
-            e.preventDefault();
-            let keyword = $('#searchInput').val();
-            if (keyword) {
-                fetch(`/DoAnCK-main/index.php?controller=search&action=ajax&keyword=${encodeURIComponent(keyword)}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        // Handle the search results
-                    });
-            }
-        });
-    </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script>
+            $(document).ready(function() {
+                // Fix Search Form Submit
+                $('#searchForm').submit(function(e) {
+                    e.preventDefault();
+                    let keyword = $('#searchInput').val().trim();
+                    if (keyword) {
+                        window.location.href = `index.php?controller=search&keyword=${encodeURIComponent(keyword)}`;
+                    }
+                    return false;
+                });
+            });
+            </script>
+    
 </body>
 </html>
 <script>
 const input = document.getElementById("searchInput");
 const box = document.getElementById("searchBox");
-
 let timer = null;
 
-input.addEventListener("keyup", function () {
+// 🔥 DÙNG window.location.origin thay vì hardcode
+const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/');
 
+input.addEventListener("input", function () {  // ✅ DÙNG "input" thay "keyup"
     clearTimeout(timer);
-
     let keyword = this.value.trim();
+
     if (keyword.length < 2) {
         box.style.display = "none";
         return;
     }
 
     timer = setTimeout(() => {
-
         let context = getCurrentContext();
-
-        fetch(`index.php?controller=search&action=ajax&keyword=${encodeURIComponent(keyword)}&context=${context}`)
-            .then(res => res.json())
-            .then(data => {
-
-                if (!data.length) {
-                    box.innerHTML = "<div style='padding:10px'>Không có kết quả</div>";
-                    box.style.display = "block";
-                    return;
-                }
-
-                let html = "";
-
-                data.forEach(item => {
-                    html += `
-                        <a href="${item.link}" style="display:block;padding:10px;border-bottom:1px solid #eee;text-decoration:none;">
-                            <div><b>${item.title}</b></div>
-                            <small>${item.type}</small>
-                        </a>
-                    `;
-                });
-
-                box.innerHTML = html;
+        
+        // ✅ DÙNG DYNAMIC URL
+        fetch(`${window.location.origin}${window.location.pathname}?controller=search&action=ajax&keyword=${encodeURIComponent(keyword)}&context=${context}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(res => {
+            if (!res.ok) throw new Error('Network response was not ok');
+            return res.json();
+        })
+        .then(data => {
+            console.log("✅ Search data:", data); // Debug
+            
+            if (!data || data.length === 0) {
+                box.innerHTML = `<div style="padding:12px;color:#666;font-style:italic">Không tìm thấy "${keyword}"</div>`;
                 box.style.display = "block";
+                return;
+            }
+
+            let html = "";
+            data.forEach((item, index) => {
+                html += `
+                    <a href="${item.link}" 
+                       class="search-result-item"
+                       style="display:block;padding:12px;border-bottom:1px solid #eee;text-decoration:none;color:#333;">
+                        <div style="font-weight:500;font-size:14px">${item.title}</div>
+                        <small style="color:#666">${item.type}</small>
+                    </a>
+                `;
             });
 
+            box.innerHTML = html;
+            box.style.display = "block";
+        })
+        .catch(error => {
+            console.error("❌ Search error:", error);
+            box.innerHTML = `<div style="padding:12px;color:#e74c3c">Lỗi tìm kiếm, thử lại!</div>`;
+            box.style.display = "block";
+        });
     }, 300);
 });
 
-document.addEventListener("click", function(e){
+// Ẩn search box khi click outside
+document.addEventListener("click", function (e) {
     if (!document.getElementById("searchForm").contains(e.target)) {
         box.style.display = "none";
     }
 });
 
 function getCurrentContext() {
-    const controller = new URLSearchParams(window.location.search).get("controller");
+    const params = new URLSearchParams(window.location.search);
+    const controller = params.get("controller");
 
-    if (controller === "actor") return "actor";
+    // ✅ FIX: Kiểm tra chính xác hơn
+    if (controller === "actor" || controller === "home" && params.get("action") === "actors") return "actor";
     if (controller === "movie") return "movie";
     if (controller === "news") return "news";
-
-    return "home";
+    
+    return "movie"; // Default
 }
+
+// CSS cho search box đẹp hơn
+const style = document.createElement('style');
+style.textContent = `
+    #searchBox {
+        position: absolute !important;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        max-height: 400px;
+        overflow-y: auto;
+        z-index: 99999;
+        margin-top: 5px;
+    }
+    .search-result-item:hover {
+        background: #f8f9fa !important;
+    }
+`;
+document.head.appendChild(style);
 </script>

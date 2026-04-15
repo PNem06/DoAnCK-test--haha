@@ -8,6 +8,12 @@ require_once 'Config/config.php';
 
 ob_start();
 
+// 🔥 DEBUG SEARCH - THÊM VÀO ĐẦU FILE index.php (sau ob_start())
+if (isset($_GET['controller']) && $_GET['controller'] === 'search') {
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+    echo "SEARCH DEBUG MODE\n";
+}
 // CHẶN LOGIN
 if (!isset($_SESSION['user_obj'])) {
     $controllerCheck = $_GET['controller'] ?? '';
@@ -115,6 +121,16 @@ try {
         $ctrl->addComment();
     } elseif ($action === 'delete') {
         $ctrl->deleteComment();
+    }
+    break;
+    // Trong switch case 'search':
+case 'search':
+    require_once 'App/Controllers/TNhu2006/SearchController.php';
+    $ctrl = new \App\Controllers\TNhu2006\SearchController();
+
+    if ($action === 'ajax') {
+        $ctrl->ajax();
+        exit; // 🔥 QUAN TRỌNG - DỪNG NGAY!
     }
     break;
         // ================= DEFAULT =================
