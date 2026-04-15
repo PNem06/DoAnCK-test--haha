@@ -29,9 +29,35 @@ class AccountController {
         $email = $_POST['email'];
         $tel = $_POST['tel'];
 
-        $user->updateProfile($email, $tel);
+        $imgName = $user->getImg(); // giữ ảnh cũ
 
-        // Lưu DB
+        if (!empty($_FILES['avatar']['name'])) {
+
+            $targetDir = "uploads/";
+            $fileName = time() . "_" . basename($_FILES["avatar"]["name"]);
+            $targetFile = $targetDir . $fileName;
+
+            move_uploaded_file($_FILES["avatar"]["tmp_name"], $targetFile);
+
+            $imgName = $fileName;
+        }
+
+$user->updateProfile($email, $tel, $imgName);
+
+        // 🔥 XỬ LÝ UPLOAD AVATAR
+        if (!empty($_FILES['avatar']['name'])) {
+
+            $targetDir = "uploads/";
+            $fileName = time() . "_" . basename($_FILES["avatar"]["name"]);
+            $targetFile = $targetDir . $fileName;
+
+            move_uploaded_file($_FILES["avatar"]["tmp_name"], $targetFile);
+
+            $imgName = $fileName;
+        }
+
+        $user->updateProfile($email, $tel, $imgName);
+
         $user->save(\Database::getInstance()->getConnection());
 
         $_SESSION['user_obj'] = $user;

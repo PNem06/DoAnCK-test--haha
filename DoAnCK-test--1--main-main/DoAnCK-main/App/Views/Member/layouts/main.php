@@ -172,8 +172,9 @@ nav.navbar {
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" 
                            role="button" data-bs-toggle="dropdown">
-                            <img src="uploads/<?= $_SESSION['user_obj']->img ?? 'default-avatar.png' ?>" 
-                                 class="user-avatar me-2" alt="Avatar">
+                            <img src="/uploads/Account_Img/<?= htmlspecialchars($_SESSION['user_obj']->getImg()) ?>"
+                                class="user-avatar me-2"
+                                alt="Avatar">
                             <span><?= $_SESSION['user_obj']->getUser() ?></span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">

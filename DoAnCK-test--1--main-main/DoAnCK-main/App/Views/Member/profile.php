@@ -11,7 +11,20 @@
         <?php unset($_SESSION['success']); ?>
     <?php endif; ?>
 
-    <form method="post" action="index.php?controller=account&action=updateProfile">
+        <div class="mb-3 text-center">
+        <img src="uploads/<?= $user->getImg() ?>" 
+            class="rounded-circle mb-2" 
+            width="100" height="100">
+    </div>
+
+    <div class="mb-3">
+        <label>Đổi avatar</label>
+        <input type="file" name="avatar" class="form-control">
+    </div>
+    
+    <form method="post" 
+      action="index.php?controller=account&action=updateProfile"
+      enctype="multipart/form-data">
 
         <div class="mb-3">
             <label>Tên đăng nhập</label>

@@ -48,10 +48,14 @@ class Account {
     }
 
     // ===== UPDATE PROFILE =====
-    public function updateProfile(string $email, string $tel): void {
-        $this->email = $email;
-        $this->tel = $tel;
+    public function updateProfile(string $email, string $tel, ?string $img = null): void {
+    $this->email = $email;
+    $this->tel = $tel;
+
+    if ($img !== null) {
+        $this->img = $img;
     }
+}
 
     // ===== GETTER =====
     public function getId(): int { return $this->id; }
@@ -78,12 +82,13 @@ class Account {
     }
 
     public function save($db) {
-        $sql = "CALL sp_UpdateAccount(?, ?, ?)";
+    $sql = "CALL sp_UpdateAccountFull(?, ?, ?, ?)";
         $stmt = $db->prepare($sql);
         return $stmt->execute([
             $this->id,
             $this->email,
-            $this->tel
+            $this->tel,
+            $this->img
         ]);
     }
 }
