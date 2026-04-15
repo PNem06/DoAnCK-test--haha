@@ -1,0 +1,144 @@
+<?php
+
+require_once 'App/Models/MonUkou/Account.php';
+session_start();
+
+require_once 'Config/database.php';
+require_once 'Config/config.php';
+
+ob_start();
+
+// CHẶN LOGIN
+if (!isset($_SESSION['user_obj'])) {
+    $controllerCheck = $_GET['controller'] ?? '';
+    if ($controllerCheck !== 'account') {
+        header("Location: index.php?controller=account&action=login");
+        exit;
+    }
+}
+
+try {
+
+    $controller = $_GET['controller'] ?? 'home';
+    $action = $_GET['action'] ?? 'index';
+    $page = $_GET['page'] ?? 1;
+    $id = $_GET['id'] ?? 0;
+
+    switch ($controller) {
+
+        // ================= ADMIN =================
+        case 'admin':
+            require_once 'App/Controllers/MonUkou/AdminController.php';
+            $ctrl = new \App\Controllers\MonUkou\AdminController();
+
+            if (!isset($_SESSION['user_obj']) || $_SESSION['user_obj']->getRole() != 1) {
+                header("Location: index.php");
+                exit;
+            }
+
+            if ($action === 'dashboard') $ctrl->dashboard();
+            else $ctrl->dashboard();
+            break;
+
+        // ================= ACCOUNT =================
+        case 'account':
+            require_once 'App/Controllers/MonUkou/AccountController.php';
+            $ctrl = new \App\Controllers\MonUkou\AccountController();
+
+            if ($action === 'login') {
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    $ctrl->login(Database::getInstance()->getConnection());
+                } else {
+                    $ctrl->showLogin();
+                }
+            } elseif ($action === 'profile') {
+                $ctrl->profile();
+            } elseif ($action === 'updateProfile') {
+                $ctrl->updateProfile();
+            } elseif ($action === 'logout') {
+                $ctrl->logout();
+            }
+            break;
+
+        // ================= HOME =================
+        case 'home':
+            require_once 'App/Controllers/PNem06/HomeController.php';
+            $ctrl = new HomeController(Database::getInstance()->getConnection());
+
+            if ($action === 'movies') $ctrl->movies($page);
+            elseif ($action === 'actors') $ctrl->actors($page);
+            else $ctrl->index($page);
+            break;
+
+        // ================= MOVIE =================
+        case 'movie':
+            require_once 'App/Controllers/birb109/MovieController.php';
+            $ctrl = new MovieController(Database::getInstance()->getConnection());
+
+            if ($action === 'detail' || $action === 'showDetail') {  // ✅ HỖ TRỢ CẢ 2
+                $ctrl->showDetail($id);
+            } else {
+                $ctrl->index($page);
+            }
+            break;
+
+        // ================= ACTOR =================
+        case 'actor':
+    require_once 'App/Controllers/PNem06/ActorController.php';
+    $ctrl = new ActorController();
+    if ($action === 'detail' || $action === 'showProfile') {
+        $ctrl->showProfile($id);
+    } else {
+        $ctrl->index($page);
+    }
+    break;
+
+    // ================= NEWS =================
+    case 'news':
+        require_once 'App/Controllers/TNhu2006/NewsController.php';
+        $ctrl = new NewsController();
+
+        if ($action === 'showDetail') {
+            $ctrl->showDetail($id);
+        } else {
+            $ctrl->index();
+        }
+        break;
+
+    // ================= COMMENT =================
+
+    case 'comment':
+    require_once 'App/Controllers/TNhu2006/CommentController.php';
+    $ctrl = new CommentController();
+
+    if ($action === 'add') {
+        $ctrl->addComment();
+    } elseif ($action === 'delete') {
+        $ctrl->deleteComment();
+    }
+    break;
+        // ================= DEFAULT =================
+        default:
+            require_once 'App/Controllers/PNem06/HomeController.php';
+            $ctrl = new HomeController(Database::getInstance()->getConnection());
+            $ctrl->index(1);
+            break;
+    }
+
+} catch (Exception $e) {
+    echo "<div class='alert alert-danger'>Lỗi: " . $e->getMessage() . "</div>";
+}
+
+$content = ob_get_clean();
+
+// 🔥 FIX AJAX: nếu là comment thì KHÔNG load layout
+if (($controller ?? '') === 'comment') {
+    echo $content;
+    return;
+}
+
+if (($controller ?? '') === 'account' && ($action ?? '') === 'login') {
+    echo $content;
+} else {
+    include 'App/Views/Member/layouts/main.php';
+}
