@@ -1,3 +1,6 @@
+<?php if (!isset($_SESSION['user_obj']) || $_SESSION['user_obj']->getRole() != 1): ?>
+    <?php header("Location: index.php"); exit; ?>
+<?php endif; ?>
 <?php
 require_once __DIR__ . '/../../../Config/config.php';
 require_once __DIR__ . '/../../../Config/database.php';
@@ -197,20 +200,25 @@ function escape($value) {
             <div class="row g-4">
                 <div class="col-lg-3">
                     <aside class="glass-panel sidebar-panel h-100">
-                        <div class="d-flex align-items-center gap-3 mb-4">
-                            <div class="brand-mark"><i class="fas fa-film"></i></div>
-                            <div>
-                                <h4 class="mb-0 fw-bold">Admin Panel</h4>
-                                <div class="text-muted small">Điện ảnh & Sao</div>
-                            </div>
-                        </div>
-                        <div class="d-grid gap-2">
-                            <a class="sidebar-link" href="index.php?controller=admin&action=dashboard"><i class="fas fa-chart-line"></i><span>Dashboard</span></a>
-                            <a class="sidebar-link" href="index.php"><i class="fas fa-house"></i><span>Trang chủ</span></a>
-                            <a class="sidebar-link" href="index.php?controller=news"><i class="fas fa-newspaper"></i><span>Tin tức</span></a>
-                            <a class="sidebar-link" href="index.php?controller=admin&action=addpost"><i class="fas fa-plus"></i><span>Thêm bài viết</span></a>
-                        </div>
-                    </aside>
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <div class="brand-mark"><i class="fas fa-film"></i></div>
+        <div>
+            <h4 class="mb-0 fw-bold">Admin Panel</h4>
+            <div class="text-muted small">Điện ảnh & Sao</div>
+        </div>
+    </div>
+    <div class="d-grid gap-2">
+        <a class="sidebar-link" href="index.php?controller=admin&action=dashboard">
+            <i class="fas fa-chart-line"></i><span>Dashboard</span>
+        </a>
+        <a class="sidebar-link" href="index.php?controller=admin&action=addpost">
+            <i class="fas fa-plus"></i><span>Thêm bài viết</span>
+        </a>
+        <a class="sidebar-link active" href="index.php?controller=admin&action=editpost&id=<?= $GLOBALS['postId'] ?>">
+            <i class="fas fa-edit"></i><span>Chỉnh sửa</span>
+        </a>
+    </div>
+</aside>
                 </div>
                 <div class="col-lg-9">
                     <main class="glass-panel content-panel">

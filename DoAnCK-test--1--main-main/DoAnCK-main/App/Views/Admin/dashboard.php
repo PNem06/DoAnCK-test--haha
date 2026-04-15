@@ -1,4 +1,6 @@
-
+<?php if (!isset($_SESSION['user_obj']) || $_SESSION['user_obj']->getRole() != 1): ?>
+    <?php header("Location: index.php"); exit; ?>
+<?php endif; ?>
 <?php
 require_once __DIR__ . '/../../../Config/config.php';
 require_once __DIR__ . '/../../../Config/database.php';
@@ -300,51 +302,65 @@ try {
             <div class="row g-4">
                 <div class="col-lg-3">
                     <aside class="glass-panel sidebar-panel h-100">
-                        <div class="d-flex align-items-center gap-3 mb-4">
-                            <div class="brand-mark">
-                                <i class="fas fa-film"></i>
-                            </div>
-                            <div>
-                                <h4 class="mb-0 fw-bold">Admin Panel</h4>
-                                <div class="text-muted small">Điện ảnh & Sao</div>
-                            </div>
-                        </div>
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <div class="brand-mark">
+            <i class="fas fa-film"></i>
+        </div>
+        <div>
+            <h4 class="mb-0 fw-bold">Admin Panel</h4>
+            <div class="text-muted small">Điện ảnh & Sao</div>
+        </div>
+    </div>
 
-                        <div class="d-grid gap-2">
-                            <a class="sidebar-link <?= $selectedFilter === 'all' ? 'active' : '' ?>" href="index.php?controller=admin&action=dashboard&filter=all">
-                                <i class="fas fa-chart-line"></i>
-                                <span>Tổng quan</span>
-                            </a>
-                            <a class="sidebar-link <?= $selectedFilter === 'movie' ? 'active' : '' ?>" href="index.php?controller=admin&action=dashboard&filter=movie">
-                                <i class="fas fa-newspaper"></i>
-                                <span>Tin phim</span>
-                            </a>
-                            <a class="sidebar-link <?= $selectedFilter === 'actor' ? 'active' : '' ?>" href="index.php?controller=admin&action=dashboard&filter=actor">
-                                <i class="fas fa-clapperboard"></i>
-                                <span>Tin diễn viên</span>
-                            </a>
-                            <a class="sidebar-link <?= $selectedFilter === 'comments' ? 'active' : '' ?>" href="index.php?controller=admin&action=dashboard&filter=comments">
-                                <i class="fas fa-comments"></i>
-                                <span>Bình luận</span>
-                            </a>
-                        </div>
+    <div class="d-grid gap-2">
+        <a class="sidebar-link <?= ($GLOBALS['selectedFilter'] ?? 'all') === 'all' ? 'active' : '' ?>" 
+           href="index.php?controller=admin&action=dashboard&filter=all">
+            <i class="fas fa-chart-line"></i>
+            <span>Tổng quan</span>
+        </a>
+        <a class="sidebar-link <?= ($GLOBALS['selectedFilter'] ?? '') === 'movie' ? 'active' : '' ?>" 
+           href="index.php?controller=admin&action=dashboard&filter=movie">
+            <i class="fas fa-film"></i>
+            <span>Tin phim</span>
+        </a>
+        <a class="sidebar-link <?= ($GLOBALS['selectedFilter'] ?? '') === 'actor' ? 'active' : '' ?>" 
+           href="index.php?controller=admin&action=dashboard&filter=actor">
+            <i class="fas fa-user"></i>
+            <span>Tin diễn viên</span>
+        </a>
+        <a class="sidebar-link <?= ($GLOBALS['selectedFilter'] ?? '') === 'comments' ? 'active' : '' ?>" 
+           href="index.php?controller=admin&action=dashboard&filter=comments">
+            <i class="fas fa-comments"></i>
+            <span>Bình luận</span>
+        </a>
+        <a class="sidebar-link <?= ($GLOBALS['selectedFilter'] ?? '') === 'draft' ? 'active' : '' ?>" 
+           href="index.php?controller=admin&action=dashboard&filter=draft">
+            <i class="fas fa-edit"></i>
+            <span>Bản nháp</span>
+        </a>
+        <a class="sidebar-link" href="index.php?controller=admin&action=addpost">
+            <i class="fas fa-plus"></i>
+            <span>Thêm bài viết</span>
+        </a>
+    </div>
 
-                        <div class="mt-4 pt-3 border-top">
-                            <div class="small text-muted mb-2">Bài viết mới nhất</div>
-                            <ul class="list-unstyled mb-0 table-mini">
-                                <?php if (empty($latestPosts)): ?>
-                                    <li class="py-2 text-muted">Chưa có dữ liệu.</li>
-                                <?php else: ?>
-                                    <?php foreach ($latestPosts as $post): ?>
-                                        <li class="py-2">
-                                            <div class="fw-semibold small"><?= htmlspecialchars($post['New_Title']) ?></div>
-                                            <div class="text-muted small"><?= date('d/m/Y', strtotime($post['New_PublishDate'])) ?></div>
-                                        </li>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </ul>
-                        </div>
-                    </aside>
+    <!-- Latest posts -->
+    <div class="mt-4 pt-3 border-top">
+        <div class="small text-muted mb-2">Bài viết mới nhất</div>
+        <ul class="list-unstyled mb-0 table-mini">
+            <?php if (empty($GLOBALS['latestPosts'] ?? [])): ?>
+                <li class="py-2 text-muted">Chưa có dữ liệu.</li>
+            <?php else: ?>
+                <?php foreach ($GLOBALS['latestPosts'] as $post): ?>
+                    <li class="py-2">
+                        <div class="fw-semibold small"><?= htmlspecialchars($post['New_Title']) ?></div>
+                        <div class="text-muted small"><?= date('d/m/Y', strtotime($post['New_PublishDate'])) ?></div>
+                    </li>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </ul>
+    </div>
+</aside>
                 </div>
 
                 <div class="col-lg-9">
@@ -428,11 +444,16 @@ try {
                                 <h2 class="h4 fw-bold mb-1"><?= $selectedFilter === 'comments' ? 'Danh sách bình luận' : 'Danh sách bài viết' ?></h2>
                             </div>
                             <div class="filter-bar d-flex flex-wrap gap-2">
-                                <a class="btn <?= $selectedFilter === 'all' ? 'btn-dark' : 'btn-outline-dark' ?>" href="?filter=all">Tất cả</a>
-                                <a class="btn <?= $selectedFilter === 'movie' ? 'btn-primary' : 'btn-outline-primary' ?>" href="?filter=movie">Tin phim</a>
-                                <a class="btn <?= $selectedFilter === 'actor' ? 'btn-success' : 'btn-outline-success' ?>" href="?filter=actor">Diễn viên</a>
-                                <a class="btn <?= $selectedFilter === 'comments' ? 'btn-info text-white' : 'btn-outline-info' ?>" href="?filter=comments">Bình luận</a>
-                                <a class="btn <?= $selectedFilter === 'draft' ? 'btn-warning' : 'btn-outline-warning' ?>" href="?filter=draft">Bản nháp</a>
+                                <a class="btn <?= ($GLOBALS['selectedFilter'] ?? '') === 'all' ? 'btn-dark' : 'btn-outline-dark' ?>" 
+                                href="index.php?controller=admin&action=dashboard&filter=all">Tất cả</a>
+                                <a class="btn <?= ($GLOBALS['selectedFilter'] ?? '') === 'movie' ? 'btn-primary' : 'btn-outline-primary' ?>" 
+                                href="index.php?controller=admin&action=dashboard&filter=movie">Tin phim</a>
+                                <a class="btn <?= ($GLOBALS['selectedFilter'] ?? '') === 'actor' ? 'btn-success' : 'btn-outline-success' ?>" 
+                                href="index.php?controller=admin&action=dashboard&filter=actor">Diễn viên</a>
+                                <a class="btn <?= ($GLOBALS['selectedFilter'] ?? '') === 'comments' ? 'btn-info text-white' : 'btn-outline-info' ?>" 
+                                href="index.php?controller=admin&action=dashboard&filter=comments">Bình luận</a>
+                                <a class="btn <?= ($GLOBALS['selectedFilter'] ?? '') === 'draft' ? 'btn-warning' : 'btn-outline-warning' ?>" 
+                                href="index.php?controller=admin&action=dashboard&filter=draft">Bản nháp</a>
                             </div>
                         </section>
 
@@ -536,12 +557,12 @@ try {
                             <?php endif; ?>
                         </section>
 
-                        <?php if ($totalPages > 1): ?>
+                        <?php if (($GLOBALS['totalPages'] ?? 1) > 1): ?>
                             <nav aria-label="Phân trang bài viết" class="mt-4">
                                 <ul class="pagination justify-content-center flex-wrap">
-                                    <?php for ($pageIndex = 1; $pageIndex <= $totalPages; $pageIndex++): ?>
-                                        <?php $query = '?filter=' . urlencode($selectedFilter) . '&page=' . $pageIndex; ?>
-                                        <li class="page-item <?= $pageIndex === $page ? 'active' : '' ?>">
+                                    <?php for ($pageIndex = 1; $pageIndex <= $GLOBALS['totalPages']; $pageIndex++): ?>
+                                        <?php $query = 'index.php?controller=admin&action=dashboard&filter=' . urlencode($GLOBALS['selectedFilter']) . '&page=' . $pageIndex; ?>
+                                        <li class="page-item <?= $pageIndex === $GLOBALS['page'] ? 'active' : '' ?>">
                                             <a class="page-link" href="<?= htmlspecialchars($query) ?>"><?= $pageIndex ?></a>
                                         </li>
                                     <?php endfor; ?>

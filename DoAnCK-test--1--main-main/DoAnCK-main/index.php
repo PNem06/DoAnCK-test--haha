@@ -33,18 +33,35 @@ try {
     switch ($controller) {
 
         // ================= ADMIN =================
-        case 'admin':
-            require_once 'App/Controllers/MonUkou/AdminController.php';
-            $ctrl = new \App\Controllers\MonUkou\AdminController();
+        // THAY THẾ case 'admin' trong index.php:
+case 'admin':
+    require_once 'App/Controllers/MonUkou/AdminController.php';
+    $ctrl = new \App\Controllers\MonUkou\AdminController();
 
-            if (!isset($_SESSION['user_obj']) || $_SESSION['user_obj']->getRole() != 1) {
-                header("Location: index.php");
-                exit;
-            }
+    // Kiểm tra quyền admin
+    if (!isset($_SESSION['user_obj']) || $_SESSION['user_obj']->getRole() != 1) {
+        header("Location: index.php");
+        exit;
+    }
 
-            if ($action === 'dashboard') $ctrl->dashboard();
-            else $ctrl->dashboard();
+    switch($action) {
+        case 'dashboard':
+            $ctrl->dashboard();
             break;
+        case 'addpost':
+            $ctrl->addpost();
+            break;
+        case 'editpost':
+            $ctrl->editpost();
+            break;
+        case 'detailpost':
+            $ctrl->detailpost();
+            break;
+        default:
+            $ctrl->dashboard();
+            break;
+    }
+    break;
 
         // ================= ACCOUNT =================
         case 'account':
