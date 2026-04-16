@@ -167,14 +167,27 @@ nav.navbar {
             </form>
 
             <!-- User Menu -->
+            <!-- User Menu -->
             <ul class="navbar-nav">
                 <?php if (isset($_SESSION['user_obj'])): ?>
+                    <?php
+                        $avatarFile = basename($_SESSION['user_obj']->getImg() ?: 'default-avatar.png');
+                        $avatarPath = 'uploads/accounts/' . $avatarFile;
+                        $fallbackAvatarPath = 'uploads/accounts/default-avatar.png';
+
+                        if (!is_file(_DIR_ . '/../../../../' . $fallbackAvatarPath)) {
+                            $fallbackAvatarPath = 'uploads/accounts/image.png';
+                        }
+
+                        if (!is_file(_DIR_ . '/../../../../' . $avatarPath)) {
+                            $avatarPath = $fallbackAvatarPath;
+                        }
+                    ?>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" 
                            role="button" data-bs-toggle="dropdown">
-                            <img src="/uploads/Account_Img/<?= htmlspecialchars($_SESSION['user_obj']->getImg()) ?>"
-                                class="user-avatar me-2"
-                                alt="Avatar">
+                            <img src="<?= htmlspecialchars($avatarPath, ENT_QUOTES, 'UTF-8') ?>" 
+                                 class="user-avatar me-2" alt="Avatar">
                             <span><?= $_SESSION['user_obj']->getUser() ?></span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">

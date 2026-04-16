@@ -82,7 +82,7 @@ if (!$news) {
                         <?php foreach (array_slice($comments, 0, 10) as $comment): ?>
                         <div class="p-4 border-bottom hover-bg-light">
                             <div class="d-flex align-items-start gap-3">
-                                <img src="uploads/<?= $comment['Account_img'] ?? 'default-avatar.png' ?>"
+                                <img src="uploads/accounts/<?= $comment['Account_Img'] ?? 'default-avatar.png' ?>"
                                      class="rounded-circle shadow-sm"
                                      style="width: 48px; height: 48px; object-fit: cover;">
                                 <div class="flex-grow-1 min-width-0">
@@ -173,7 +173,7 @@ document.getElementById("commentForm")?.addEventListener("submit", function(e){
         let html = `
         <div class="p-4 border-bottom">
             <div class="d-flex align-items-start gap-3">
-                <img src="uploads/<?= $_SESSION['user_obj']->img ?? 'default-avatar.png' ?>"
+                <img src="uploads/accounts/<?= $_SESSION['user_obj']->img ?? 'default-avatar.png' ?>"
                     class="rounded-circle"
                     style="width:48px;height:48px;object-fit:cover;">
                 <div>

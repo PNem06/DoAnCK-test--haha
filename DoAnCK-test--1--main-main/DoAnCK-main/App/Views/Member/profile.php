@@ -12,7 +12,7 @@
     <?php endif; ?>
 
         <div class="mb-3 text-center">
-        <img src="uploads/<?= $user->getImg() ?>" 
+        <img src="uploads/accounts/<?= htmlspecialchars($user->getImg(), ENT_QUOTES, 'UTF-8') ?>" 
             class="rounded-circle mb-2" 
             width="100" height="100">
     </div>

@@ -2,9 +2,11 @@
 class StudioController {
     private $db;
 
+
     public function __construct($db) {
         $this->db = $db;
     }
+
 
     // index(): Danh sách hãng phim
     public function index() {
@@ -18,3 +20,7 @@ class StudioController {
         }
     }
 }
+
+
+
+

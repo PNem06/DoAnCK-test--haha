@@ -9,7 +9,7 @@ class Database {
     private function __construct() {
         // Dùng config cũ của bạn
         $host = defined('HOST') ? HOST : 'localhost';
-        $dbname = defined('DB') ? DB : 'db_web1';
+        $dbname = defined('DB') ? DB : 'db_web2';
         $user = defined('USER') ? USER : 'root';
         $pass = defined('PASSWORD') ? PASSWORD : '';
 
@@ -46,7 +46,7 @@ class Database {
 
     public function getMysqliConnection() {
         $host = defined('HOST') ? HOST : 'localhost';
-        $dbname = defined('DB') ? DB : 'db_web1';
+        $dbname = defined('DB') ? DB : 'db_web2';
         $user = defined('USER') ? USER : 'root';
         $pass = defined('PASSWORD') ? PASSWORD : '';
 

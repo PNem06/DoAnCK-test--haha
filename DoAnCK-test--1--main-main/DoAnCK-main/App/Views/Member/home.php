@@ -178,7 +178,7 @@ $totalNews = isset($GLOBALS['totalNews']) ? $GLOBALS['totalNews'] : (count($news
 .hover-primary:hover { color: #667eea !important; text-shadow: 0 2px 4px rgba(102,126,234,0.3) !important; }
 .hover-shadow-lg { transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important; }
 .hover-shadow-lg:hover { transform: translateY(-15px) scale(1.03) !important; box-shadow: 0 30px 60px rgba(0,0,0,0.25) !important; border-color: rgba(102,126,234,0.2) !important; }
-.gradient-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--primary-gradient); opacity: 0.85; z-index: 1; }
+.gradient-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--primary-gradient); opacity: 0.5; z-index: 1; }
 .card-img-top i { z-index: 2; position: relative; }
 .page-link { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; }
 .page-link:hover:not(.active) { transform: translateY(-3px) scale(1.05) !important; box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important; background: rgba(102,126,234,0.1) !important; border-color: rgba(102,126,234,0.3) !important; }
