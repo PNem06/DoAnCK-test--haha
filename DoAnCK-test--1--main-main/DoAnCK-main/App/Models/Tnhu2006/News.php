@@ -1,11 +1,14 @@
 
+
  <?php
 class News {
     private $conn;
 
+
     public function __construct(mysqli $db){
         $this->conn = $db;
     }
+
 
     // =========================
     // LATEST NEWS
@@ -15,13 +18,17 @@ class News {
         $stmt->bind_param("i", $limit);
         $stmt->execute();
 
+
         $result = $stmt->get_result();
+
 
         $stmt->close();
         $this->conn->next_result();
 
+
         return $result;
     }
+
 
     // =========================
     // GET BY ID
@@ -31,13 +38,17 @@ class News {
         $stmt->bind_param("i", $id);
         $stmt->execute();
 
+
         $result = $stmt->get_result()->fetch_assoc();
+
 
         $stmt->close();
         $this->conn->next_result();
 
+
         return $result;
     }
+
 
     // =========================
     // INCREASE VIEW (✔ CHỈ 1 HÀM)
@@ -47,11 +58,14 @@ class News {
         $stmt->bind_param("i", $id);
         $stmt->execute();
 
+
         $stmt->close();
         $this->conn->next_result();
 
+
         return true;
     }
+
 
     // =========================
     // COMMENTS
@@ -61,13 +75,17 @@ class News {
         $stmt->bind_param("i", $news_id);
         $stmt->execute();
 
+
         $result = $stmt->get_result();
+
 
         $stmt->close();
         $this->conn->next_result();
 
+
         return $result;
     }
+
 
     // =========================
     // RELATED NEWS
@@ -77,12 +95,17 @@ class News {
         $stmt->bind_param("isi", $newsId, $category, $limitNum);
         $stmt->execute();
 
+
         $result = $stmt->get_result();
+
 
         $stmt->close();
         $this->conn->next_result();
+
 
         return $result;
     }
 }
 ?>
+
+

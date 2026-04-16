@@ -12,6 +12,7 @@ $pageTitle = $GLOBALS['pageTitle'] ?? 'Danh sách diễn viên';
     </div>
 </div>
 
+
 <!-- Danh sách diễn viên -->
 <div class="row g-4">
     <?php if (!empty($actors)): ?>
@@ -19,8 +20,8 @@ $pageTitle = $GLOBALS['pageTitle'] ?? 'Danh sách diễn viên';
         <div class="col-lg-4 col-md-6 col-sm-12">
             <div class="card h-100 hover-shadow">
                 <div class="card-img-top position-relative overflow-hidden" style="height: 300px;">
-                    <img src="uploads/actors/<?= $actor->Actor_Img ?? 'default-avatar.png' ?>" 
-                         class="card-img-top w-100 h-100 object-fit-cover" 
+                    <img src="uploads/actors/<?= $actor->Actor_Img ?? 'default-avatar.png' ?>"
+                         class="card-img-top w-100 h-100 object-fit-cover"
                          alt="<?= htmlspecialchars($actor->Actor_Name ?? 'Diễn viên') ?>"
                          onerror="this.src='https://via.placeholder.com/300x300/764ba2/ffffff?text=Diễn+viên'">
                     <div class="position-absolute bottom-0 start-0 bg-primary bg-opacity-90 text-white p-2">
@@ -29,7 +30,7 @@ $pageTitle = $GLOBALS['pageTitle'] ?? 'Danh sách diễn viên';
                 </div>
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">
-                        <a href="index.php?controller=actor&action=detail&id=<?= $actor->Actor_ID ?>" 
+                        <a href="index.php?controller=actor&action=detail&id=<?= $actor->Actor_ID ?>"
                         class="text-decoration-none fw-bold text-dark">
                             <?= htmlspecialchars($actor->Actor_Name ?? 'N/A') ?>
                         </a>
@@ -39,9 +40,9 @@ $pageTitle = $GLOBALS['pageTitle'] ?? 'Danh sách diễn viên';
                     </p>
                     <p class="text-success fw-bold mb-2">
                         <i class="fas fa-film me-1"></i>
-                        <?= $actor->movie_count ?> phim 
+                        <?= $actor->movie_count ?> phim
                     </p>
-                    <a href="index.php?controller=actor&action=detail&id=<?= $actor->Actor_ID ?>" 
+                    <a href="index.php?controller=actor&action=detail&id=<?= $actor->Actor_ID ?>"
                     class="btn btn-primary w-100 mt-auto">
                         <i class="fas fa-eye me-2"></i>Xem tiểu sử
                     </a>
@@ -59,7 +60,9 @@ $pageTitle = $GLOBALS['pageTitle'] ?? 'Danh sách diễn viên';
     <?php endif; ?>
 </div>
 
+
 <!-- Phân trang - FIX UNDEFINED VARIABLES -->
+
 
 <?php if ($totalPages > 1): ?>
 <div class="row mt-5">
@@ -75,8 +78,9 @@ $pageTitle = $GLOBALS['pageTitle'] ?? 'Danh sách diễn viên';
                 </li>
                 <?php endif; ?>
 
+
                 <!-- Pages -->
-                <?php 
+                <?php
                 $startPage = max(1, $currentPage - 2);
                 $endPage = min($totalPages, $currentPage + 2);
                 ?>
@@ -87,11 +91,13 @@ $pageTitle = $GLOBALS['pageTitle'] ?? 'Danh sách diễn viên';
                     <?php endif; ?>
                 <?php endif; ?>
 
+
                 <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
                     <li class="page-item <?= $i === $currentPage ? 'active' : '' ?>">
                         <a class="page-link" href="?controller=actor&page=<?= $i ?>"><?= $i ?></a>
                     </li>
                 <?php endfor; ?>
+
 
                 <?php if ($endPage < $totalPages): ?>
                     <?php if ($endPage < $totalPages - 1): ?>
@@ -99,6 +105,7 @@ $pageTitle = $GLOBALS['pageTitle'] ?? 'Danh sách diễn viên';
                     <?php endif; ?>
                     <li class="page-item"><a class="page-link" href="?controller=actor&page=<?= $totalPages ?>"><?= $totalPages ?></a></li>
                 <?php endif; ?>
+
 
                 <!-- Next -->
                 <?php if ($currentPage < $totalPages): ?>
@@ -113,3 +120,5 @@ $pageTitle = $GLOBALS['pageTitle'] ?? 'Danh sách diễn viên';
     </div>
 </div>
 <?php endif; ?>
+
+

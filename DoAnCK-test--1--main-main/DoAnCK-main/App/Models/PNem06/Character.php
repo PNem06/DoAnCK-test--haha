@@ -18,14 +18,15 @@ class Character {
     }
     public function getCharInfo($char_id){
         $sql = "
-        SELECT 
+        SELECT
             c.Character_Name,
             a.Actor_Name
         FROM tbl_character c
-        JOIN tbl_actor a 
+        JOIN tbl_actor a
         ON c.Actor_ID = a.Actor_ID
         WHERE c.Character_ID = ?
         ";
+
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i",$char_id);
@@ -35,3 +36,7 @@ class Character {
     }
 }
 ?>
+
+
+
+

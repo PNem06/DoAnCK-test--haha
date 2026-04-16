@@ -2,47 +2,51 @@
 require_once __DIR__ . '/../../../Config/config.php';
 require_once __DIR__ . '/../../../Config/database.php';
 
+
 class Actor {
     private $conn;
     private $id;
     private $name;
     private $info;
-    
+   
     public function __construct(){
         $this->conn = Database::getInstance()->getConnection();
     }
-    
+   
     public function setActor($id,$name,$info){
         $this->id = $id;
         $this->name = $name;
         $this->info = $info;
     }
-    
+   
     public function getId(){
         return $this->id;
     }
-    
+   
     public function getName(){
         return $this->name;
     }
-    
+   
     public function getInfo(){
         return $this->info;
     }
-    
+   
     public function getActorsByMovie($movie_id){
         try {
             if (!isset($movie_id) || !is_numeric($movie_id)) {
                 return [];
             }
 
+
             $sql = "CALL sp_GetActorsByMovie(:movie_id)";
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':movie_id', $movie_id, PDO::PARAM_INT);
             $stmt->execute();
 
+
             $data = $stmt->fetchAll(PDO::FETCH_OBJ);
             $stmt->closeCursor();
+
 
             return $data ?: [];
         } catch (PDOException $e) {
@@ -50,15 +54,17 @@ class Actor {
             return [];
         }
     }
-    
+   
     public function getTopActorsByAwards(){
         try {
             $sql = "CALL sp_TopActorsByAwards()";
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();
 
+
             $data = $stmt->fetchAll(PDO::FETCH_OBJ);
             $stmt->closeCursor();
+
 
             return $data ?: [];
         } catch (PDOException $e) {
@@ -66,7 +72,7 @@ class Actor {
             return [];
         }
     }
-    
+   
     public function getActorsPaginated($offset, $limit) {
         try {
             $sql = "CALL sp_GetActorsPaginated(:offset, :limit)";
@@ -75,8 +81,10 @@ class Actor {
             $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
             $stmt->execute();
 
+
             $data = $stmt->fetchAll(PDO::FETCH_OBJ);
             $stmt->closeCursor();
+
 
             return $data ?: [];
         } catch (PDOException $e) {
@@ -84,15 +92,17 @@ class Actor {
             return [];
         }
     }
-    
+   
     public function getTotalActors() {
         try {
             $sql = "CALL sp_GetTotalActors()";
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();
 
+
             $result = $stmt->fetch(PDO::FETCH_OBJ);
             $stmt->closeCursor();
+
 
             return $result->total ?? 0;
         } catch (PDOException $e) {
@@ -100,7 +110,7 @@ class Actor {
             return 0;
         }
     }
-    
+   
     public function getMoviesByActor($actor_id) {
     try {
         $sql = "CALL sp_GetMoviesByActor(:actor_id)";
@@ -108,9 +118,12 @@ class Actor {
         $stmt->bindParam(':actor_id', $actor_id, PDO::PARAM_INT);
         $stmt->execute();
 
+
         $data = $stmt->fetchAll(PDO::FETCH_OBJ);
 
+
         $stmt->closeCursor(); // giữ
+
 
         return $data;
     } catch (PDOException $e) {
@@ -118,7 +131,7 @@ class Actor {
         return [];
     }
 }
-    
+   
     public function getMovieCount($actor_id) {
         try {
             $sql = "CALL sp_GetMovieCountByActor(:actor_id)";
@@ -126,8 +139,10 @@ class Actor {
             $stmt->bindParam(':actor_id', $actor_id, PDO::PARAM_INT);
             $stmt->execute();
 
+
             $result = $stmt->fetch(PDO::FETCH_OBJ);
             $stmt->closeCursor();
+
 
             return $result->count ?? 0;
         } catch (PDOException $e) {
@@ -136,6 +151,7 @@ class Actor {
         }
     }
 
+
     public function getActorById($actor_id) {
         try {
             $sql = "CALL sp_GetActorById(:actor_id)";
@@ -143,16 +159,20 @@ class Actor {
             $stmt->bindParam(':actor_id', $actor_id, PDO::PARAM_INT);
             $stmt->execute();
 
+
             $data = $stmt->fetch(PDO::FETCH_OBJ);
             $stmt->closeCursor();
 
+
             return $data ? $data : null;
+
 
         } catch (PDOException $e) {
             error_log("Actor getActorById: " . $e->getMessage());
             return null;
         }
     }
+
 
     // ✅ ĐẶT TRONG CLASS
     public function getActorsWithMovieCount($offset, $limit) {
@@ -163,8 +183,10 @@ class Actor {
             $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
             $stmt->execute();
 
+
             $data = $stmt->fetchAll(PDO::FETCH_OBJ);
             $stmt->closeCursor();
+
 
             return $data ?: [];
         } catch (PDOException $e) {
@@ -180,28 +202,33 @@ public function getMoviesByActorWithCount($actor_id) {
         $stmt->bindParam(':actor_id', $actor_id, PDO::PARAM_INT);
         $stmt->execute();
 
+
         $data = $stmt->fetchAll(PDO::FETCH_OBJ);
         $stmt->closeCursor();
+
 
         return $data ?: [];
     } catch (PDOException $e) {
         error_log("Error in getMoviesByActorWithCount: " . $e->getMessage());
-        
+       
         // ✅ FALLBACK: Query thủ công nếu SP không tồn tại
-        $sql = "SELECT m.*, 
+        $sql = "SELECT m.*,
                        (SELECT COUNT(*) FROM tbl_character c2 WHERE c2.Actor_ID = :actor_id2) as movie_count
                 FROM tbl_character c
                 JOIN tbl_movie m ON c.Movie_ID = m.Movie_ID
                 WHERE c.Actor_ID = :actor_id
                 ORDER BY m.Movie_ReleaseDate DESC";
-        
+       
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':actor_id', $actor_id, PDO::PARAM_INT);
         $stmt->bindParam(':actor_id2', $actor_id, PDO::PARAM_INT);
         $stmt->execute();
-        
+       
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 }
 
+
 }
+
+

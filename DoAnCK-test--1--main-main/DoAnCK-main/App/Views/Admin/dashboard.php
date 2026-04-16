@@ -5,13 +5,16 @@
 require_once __DIR__ . '/../../../Config/config.php';
 require_once __DIR__ . '/../../../Config/database.php';
 
+
 $mysqli = Database::getInstance()->getMysqliConnection();
 $selectedFilter = $_GET['filter'] ?? 'all';
 $allowedFilters = ['all', 'movie', 'actor', 'draft', 'comments'];
 
+
 if (!in_array($selectedFilter, $allowedFilters, true)) {
     $selectedFilter = 'all';
 }
+
 
 $stats = [
     'total_news' => 0,
@@ -20,13 +23,16 @@ $stats = [
     'total_comments' => 0,
 ];
 
+
 $newsList = [];
 $commentList = [];
 $latestPosts = [];
 $dbError = null;
 
+
 $page = max(1, intval($_GET['page'] ?? 1));
 $itemsPerPage = 9;
+
 
 try {
     $countQueries = [
@@ -36,12 +42,14 @@ try {
         'total_comments' => "SELECT COUNT(*) AS total FROM tbl_comment",
     ];
 
+
     foreach ($countQueries as $key => $sql) {
         $result = $mysqli->query($sql);
         if ($result) {
             $stats[$key] = (int) ($result->fetch_assoc()['total'] ?? 0);
         }
     }
+
 
     $whereClause = '';
     if ($selectedFilter === 'movie') {
@@ -52,6 +60,7 @@ try {
         $whereClause = "WHERE n.New_Status <> 'Publish'";
     }
 
+
     $isCommentView = $selectedFilter === 'comments';
     if ($isCommentView) {
         $countSql = "SELECT COUNT(*) AS total FROM tbl_comment";
@@ -59,17 +68,20 @@ try {
         $countSql = "SELECT COUNT(*) AS total FROM tbl_new n $whereClause";
     }
 
+
     $countResult = $mysqli->query($countSql);
     $totalItems = 0;
     if ($countResult) {
         $totalItems = (int) ($countResult->fetch_assoc()['total'] ?? 0);
     }
 
+
     $totalPages = max(1, (int) ceil($totalItems / $itemsPerPage));
     if ($page > $totalPages) {
         $page = $totalPages;
     }
     $offset = ($page - 1) * $itemsPerPage;
+
 
     if ($isCommentView) {
         $commentSql = "SELECT c.Comment_ID, c.Comment_Data, c.Comment_Date, c.New_ID,
@@ -96,6 +108,7 @@ try {
                     LIMIT {$offset}, {$itemsPerPage}";
         $newsResult = $mysqli->query($newsSql);
 
+
         if ($newsResult) {
             while ($row = $newsResult->fetch_assoc()) {
                 $summary = trim(substr(strip_tags($row['New_Description'] ?: $row['New_Content'] ?: ''), 0, 120));
@@ -104,6 +117,7 @@ try {
             }
         }
     }
+
 
     $latestSql = "SELECT New_ID, New_Title, New_PublishDate
                   FROM tbl_new
@@ -134,15 +148,18 @@ try {
             --text-soft: #64748b;
         }
 
+
         body {
             min-height: 100vh;
             background: var(--primary-gradient);
             color: var(--text-main);
         }
 
+
         .dashboard-shell {
             padding: 32px 0;
         }
+
 
         .glass-panel {
             background: var(--panel-bg);
@@ -152,11 +169,13 @@ try {
             backdrop-filter: blur(18px);
         }
 
+
         .sidebar-panel {
             padding: 28px 22px;
             position: sticky;
             top: 24px;
         }
+
 
         .brand-mark {
             width: 52px;
@@ -170,6 +189,7 @@ try {
             box-shadow: 0 16px 30px rgba(102, 126, 234, 0.35);
         }
 
+
         .sidebar-link {
             display: flex;
             align-items: center;
@@ -181,6 +201,7 @@ try {
             transition: all 0.25s ease;
         }
 
+
         .sidebar-link:hover,
         .sidebar-link.active {
             background: rgba(102, 126, 234, 0.12);
@@ -188,9 +209,11 @@ try {
             transform: translateX(4px);
         }
 
+
         .content-panel {
             padding: 30px;
         }
+
 
         .hero-banner {
             background: var(--primary-gradient);
@@ -199,6 +222,7 @@ try {
             padding: 28px;
             box-shadow: 0 22px 40px rgba(76, 81, 191, 0.28);
         }
+
 
         .stat-card {
             border-radius: 22px;
@@ -209,11 +233,13 @@ try {
             transition: transform 0.25s ease, box-shadow 0.25s ease;
         }
 
+
         .stat-card:hover,
         .news-card:hover {
             transform: translateY(-8px);
             box-shadow: 0 24px 45px rgba(15, 23, 42, 0.16);
         }
+
 
         .stat-icon {
             width: 54px;
@@ -226,15 +252,18 @@ try {
             font-size: 1.1rem;
         }
 
+
         .icon-news { background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%); }
         .icon-movie { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
         .icon-actor { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
         .icon-comment { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
 
+
         .filter-bar .btn {
             border-radius: 999px;
             padding: 10px 16px;
         }
+
 
         .news-card {
             border: none;
@@ -246,6 +275,7 @@ try {
             height: 100%;
         }
 
+
         .news-cover {
             height: 210px;
             background: var(--primary-gradient);
@@ -253,11 +283,13 @@ try {
             overflow: hidden;
         }
 
+
         .news-cover img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
+
 
         .news-cover-fallback {
             height: 100%;
@@ -268,16 +300,19 @@ try {
             font-size: 3rem;
         }
 
+
         .badge-floating {
             position: absolute;
             top: 16px;
             right: 16px;
         }
 
+
         .news-meta {
             color: var(--text-soft);
             font-size: 0.92rem;
         }
+
 
         .status-badge {
             border-radius: 999px;
@@ -285,9 +320,11 @@ try {
             font-weight: 600;
         }
 
+
         .table-mini li + li {
             border-top: 1px solid rgba(148, 163, 184, 0.18);
         }
+
 
         @media (max-width: 991px) {
             .sidebar-panel {
@@ -312,28 +349,29 @@ try {
         </div>
     </div>
 
+
     <div class="d-grid gap-2">
-        <a class="sidebar-link <?= ($GLOBALS['selectedFilter'] ?? 'all') === 'all' ? 'active' : '' ?>" 
+        <a class="sidebar-link <?= ($GLOBALS['selectedFilter'] ?? 'all') === 'all' ? 'active' : '' ?>"
            href="index.php?controller=admin&action=dashboard&filter=all">
             <i class="fas fa-chart-line"></i>
             <span>Tổng quan</span>
         </a>
-        <a class="sidebar-link <?= ($GLOBALS['selectedFilter'] ?? '') === 'movie' ? 'active' : '' ?>" 
+        <a class="sidebar-link <?= ($GLOBALS['selectedFilter'] ?? '') === 'movie' ? 'active' : '' ?>"
            href="index.php?controller=admin&action=dashboard&filter=movie">
             <i class="fas fa-film"></i>
             <span>Tin phim</span>
         </a>
-        <a class="sidebar-link <?= ($GLOBALS['selectedFilter'] ?? '') === 'actor' ? 'active' : '' ?>" 
+        <a class="sidebar-link <?= ($GLOBALS['selectedFilter'] ?? '') === 'actor' ? 'active' : '' ?>"
            href="index.php?controller=admin&action=dashboard&filter=actor">
             <i class="fas fa-user"></i>
             <span>Tin diễn viên</span>
         </a>
-        <a class="sidebar-link <?= ($GLOBALS['selectedFilter'] ?? '') === 'comments' ? 'active' : '' ?>" 
+        <a class="sidebar-link <?= ($GLOBALS['selectedFilter'] ?? '') === 'comments' ? 'active' : '' ?>"
            href="index.php?controller=admin&action=dashboard&filter=comments">
             <i class="fas fa-comments"></i>
             <span>Bình luận</span>
         </a>
-        <a class="sidebar-link <?= ($GLOBALS['selectedFilter'] ?? '') === 'draft' ? 'active' : '' ?>" 
+        <a class="sidebar-link <?= ($GLOBALS['selectedFilter'] ?? '') === 'draft' ? 'active' : '' ?>"
            href="index.php?controller=admin&action=dashboard&filter=draft">
             <i class="fas fa-edit"></i>
             <span>Bản nháp</span>
@@ -343,6 +381,7 @@ try {
             <span>Thêm bài viết</span>
         </a>
     </div>
+
 
     <!-- Latest posts -->
     <div class="mt-4 pt-3 border-top">
@@ -363,6 +402,7 @@ try {
 </aside>
                 </div>
 
+
                 <div class="col-lg-9">
                     <main class="glass-panel content-panel">
                         <section class="hero-banner mb-4">
@@ -378,11 +418,13 @@ try {
                             </div>
                         </section>
 
+
                         <?php if ($dbError): ?>
                             <div class="alert alert-danger rounded-4 mb-4">
                                 Không tải được dữ liệu từ database: <?= htmlspecialchars($dbError) ?>
                             </div>
                         <?php endif; ?>
+
 
                         <section class="row g-3 mb-4">
                             <div class="col-md-6 col-xl-3">
@@ -439,23 +481,25 @@ try {
                             </div>
                         </section>
 
+
                         <section class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
                             <div>
                                 <h2 class="h4 fw-bold mb-1"><?= $selectedFilter === 'comments' ? 'Danh sách bình luận' : 'Danh sách bài viết' ?></h2>
                             </div>
                             <div class="filter-bar d-flex flex-wrap gap-2">
-                                <a class="btn <?= ($GLOBALS['selectedFilter'] ?? '') === 'all' ? 'btn-dark' : 'btn-outline-dark' ?>" 
+                                <a class="btn <?= ($GLOBALS['selectedFilter'] ?? '') === 'all' ? 'btn-dark' : 'btn-outline-dark' ?>"
                                 href="index.php?controller=admin&action=dashboard&filter=all">Tất cả</a>
-                                <a class="btn <?= ($GLOBALS['selectedFilter'] ?? '') === 'movie' ? 'btn-primary' : 'btn-outline-primary' ?>" 
+                                <a class="btn <?= ($GLOBALS['selectedFilter'] ?? '') === 'movie' ? 'btn-primary' : 'btn-outline-primary' ?>"
                                 href="index.php?controller=admin&action=dashboard&filter=movie">Tin phim</a>
-                                <a class="btn <?= ($GLOBALS['selectedFilter'] ?? '') === 'actor' ? 'btn-success' : 'btn-outline-success' ?>" 
+                                <a class="btn <?= ($GLOBALS['selectedFilter'] ?? '') === 'actor' ? 'btn-success' : 'btn-outline-success' ?>"
                                 href="index.php?controller=admin&action=dashboard&filter=actor">Diễn viên</a>
-                                <a class="btn <?= ($GLOBALS['selectedFilter'] ?? '') === 'comments' ? 'btn-info text-white' : 'btn-outline-info' ?>" 
+                                <a class="btn <?= ($GLOBALS['selectedFilter'] ?? '') === 'comments' ? 'btn-info text-white' : 'btn-outline-info' ?>"
                                 href="index.php?controller=admin&action=dashboard&filter=comments">Bình luận</a>
-                                <a class="btn <?= ($GLOBALS['selectedFilter'] ?? '') === 'draft' ? 'btn-warning' : 'btn-outline-warning' ?>" 
+                                <a class="btn <?= ($GLOBALS['selectedFilter'] ?? '') === 'draft' ? 'btn-warning' : 'btn-outline-warning' ?>"
                                 href="index.php?controller=admin&action=dashboard&filter=draft">Bản nháp</a>
                             </div>
                         </section>
+
 
                         <section class="row g-4">
                             <?php if ($selectedFilter === 'comments'): ?>
@@ -511,17 +555,19 @@ try {
                                             <article class="news-card">
                                                 <div class="news-cover">
                                                     <?php if (!empty($news['New_Img'])): ?>
-                                                        <img src="<?= htmlspecialchars($news['New_Img']) ?>" alt="<?= htmlspecialchars($news['New_Title']) ?>">
+                                                        <img src="uploads/news/<?= htmlspecialchars($news['New_Img']) ?>" alt="<?= htmlspecialchars($news['New_Title']) ?>">
                                                     <?php else: ?>
                                                         <div class="news-cover-fallback">
                                                             <i class="fas <?= $isActor ? 'fa-user-astronaut' : 'fa-film' ?>"></i>
                                                         </div>
                                                     <?php endif; ?>
 
+
                                                     <span class="badge rounded-pill <?= $badgeClass ?> badge-floating px-3 py-2">
                                                         <?= $isActor ? 'Diễn viên' : 'Phim ảnh' ?>
                                                     </span>
                                                 </div>
+
 
                                                 <div class="card-body p-4">
                                                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -533,13 +579,16 @@ try {
                                                         </span>
                                                     </div>
 
+
                                                     <h3 class="h5 fw-bold mb-3"><?= htmlspecialchars($news['New_Title']) ?></h3>
                                                     <p class="text-muted mb-3"><?= htmlspecialchars($news['short_desc']) ?></p>
+
 
                                                     <div class="news-meta d-flex justify-content-between align-items-center mb-4">
                                                         <span><i class="fas fa-user me-1"></i><?= htmlspecialchars($news['Username'] ?? 'Chua ro tac gia') ?></span>
                                                         <span><i class="fas fa-calendar me-1"></i><?= !empty($news['New_PublishDate']) ? date('d/m/Y', strtotime($news['New_PublishDate'])) : '--/--/----' ?></span>
                                                     </div>
+
 
                                                     <div class="d-flex gap-2">
                                                         <a href="index.php?controller=admin&action=detailpost&id=<?= (int)$news['New_ID'] ?>" class="btn btn-outline-primary rounded-pill flex-fill">
@@ -556,6 +605,7 @@ try {
                                 <?php endif; ?>
                             <?php endif; ?>
                         </section>
+
 
                         <?php if (($GLOBALS['totalPages'] ?? 1) > 1): ?>
                             <nav aria-label="Phân trang bài viết" class="mt-4">
@@ -575,5 +625,8 @@ try {
         </div>
     </div>
 
+
 </body>
 </html>
+
+

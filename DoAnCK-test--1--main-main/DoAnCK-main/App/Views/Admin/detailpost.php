@@ -5,11 +5,13 @@
 require_once __DIR__ . '/../../../Config/config.php';
 require_once __DIR__ . '/../../../Config/database.php';
 
+
 $mysqli = Database::getInstance()->getMysqliConnection();
 $postId = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $post = null;
 $error = null;
 $success = null;
+
 
 if ($postId <= 0) {
     $error = 'ID bài viết không hợp lệ.';
@@ -30,6 +32,7 @@ if ($postId <= 0) {
         }
     }
 
+
     $stmt = $mysqli->prepare(
         'SELECT n.New_ID, n.New_Title, n.New_Description, n.New_Content, n.New_Img,
                 n.New_Category, n.New_Status, n.New_PublishDate, n.New_View,
@@ -40,12 +43,14 @@ if ($postId <= 0) {
          LIMIT 1'
     );
 
+
     if ($stmt) {
         $stmt->bind_param('i', $postId);
         $stmt->execute();
         $result = $stmt->get_result();
         $post = $result ? $result->fetch_assoc() : null;
         $stmt->close();
+
 
         if (!$post) {
             $error = 'Không tìm thấy bài viết.';
@@ -55,9 +60,11 @@ if ($postId <= 0) {
     }
 }
 
+
 function escape($value) {
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
+
 
 function formatDate($value) {
     $timestamp = strtotime($value);
@@ -80,15 +87,18 @@ function formatDate($value) {
             --text-main: #1f2937;
         }
 
+
         body {
             min-height: 100vh;
             background: var(--primary-gradient);
             color: var(--text-main);
         }
 
+
         .dashboard-shell {
             padding: 32px 0;
         }
+
 
         .glass-panel {
             background: var(--panel-bg);
@@ -98,11 +108,13 @@ function formatDate($value) {
             backdrop-filter: blur(18px);
         }
 
+
         .sidebar-panel {
             padding: 28px 22px;
             position: sticky;
             top: 24px;
         }
+
 
         .brand-mark {
             width: 52px;
@@ -116,6 +128,7 @@ function formatDate($value) {
             box-shadow: 0 16px 30px rgba(102, 126, 234, 0.35);
         }
 
+
         .sidebar-link {
             display: flex;
             align-items: center;
@@ -127,6 +140,7 @@ function formatDate($value) {
             transition: all 0.25s ease;
         }
 
+
         .sidebar-link:hover,
         .sidebar-link.active {
             background: rgba(102, 126, 234, 0.12);
@@ -134,9 +148,11 @@ function formatDate($value) {
             transform: translateX(4px);
         }
 
+
         .content-panel {
             padding: 30px;
         }
+
 
         .post-image {
             max-width: 100%;
@@ -146,35 +162,42 @@ function formatDate($value) {
             margin-bottom: 24px;
         }
 
+
         .badge-category {
             background: #eef2ff;
             color: #4338ca;
         }
+
 
         .badge-status {
             background: #eefdf3;
             color: #166534;
         }
 
+
         .badge-status.draft {
             background: #fef3c7;
             color: #92400e;
         }
+
 
         .btn-delete {
             min-width: 150px;
             border-width: 1.5px;
         }
 
+
         .metadata dt {
             font-size: 0.95rem;
             color: #475569;
         }
 
+
         .metadata dd {
             margin-bottom: 12px;
             font-size: 1rem;
         }
+
 
         @media (max-width: 991px) {
             .sidebar-panel { position: static; }
@@ -232,6 +255,7 @@ function formatDate($value) {
                             </div>
                         </div>
 
+
                         <?php if ($error): ?>
                             <div class="alert alert-danger rounded-4 mb-4"><?= escape($error) ?></div>
                         <?php elseif ($success): ?>
@@ -239,8 +263,9 @@ function formatDate($value) {
                         <?php endif; ?>
                         <?php if (!$error && $post): ?>
                             <?php if (!empty($post['New_Img'])): ?>
-                                <img src="<?= escape($post['New_Img']) ?>" alt="<?= escape($post['New_Title']) ?>" class="post-image w-100">
+                                <img src="uploads/news/<?= htmlspecialchars($news['New_Img']) ?>" alt="<?= escape($post['New_Title']) ?>" class="post-image w-100">
                             <?php endif; ?>
+
 
                             <div class="mb-4">
                                 <span class="badge badge-category px-3 py-2 rounded-pill me-2">
@@ -251,22 +276,28 @@ function formatDate($value) {
                                 </span>
                             </div>
 
+
                             <h2 class="fw-bold mb-3"><?= escape($post['New_Title']) ?></h2>
+
 
                             <?php if (!empty($post['New_Description'])): ?>
                                 <p class="lead text-muted mb-4"><?= escape($post['New_Description']) ?></p>
                             <?php endif; ?>
 
+
                             <dl class="row metadata mb-4">
                                 <dt class="col-sm-4">Ngày đăng</dt>
                                 <dd class="col-sm-8"><?= escape(formatDate($post['New_PublishDate'])) ?></dd>
 
+
                                 <dt class="col-sm-4">Người đăng</dt>
                                 <dd class="col-sm-8"><?= escape($post['Username'] ?? 'Admin') ?></dd>
+
 
                                 <dt class="col-sm-4">Số lượt xem</dt>
                                 <dd class="col-sm-8"><?= (int) $post['New_View'] ?></dd>
                             </dl>
+
 
                             <div class="border rounded-4 p-4 bg-light text-dark" style="white-space: pre-wrap;">
                                 <?= nl2br(escape($post['New_Content'])) ?>
@@ -279,3 +310,7 @@ function formatDate($value) {
     </div>
 </body>
 </html>
+
+
+
+

@@ -5,9 +5,11 @@
 require_once __DIR__ . '/../../../Config/config.php';
 require_once __DIR__ . '/../../../Config/database.php';
 
+
 $mysqli = Database::getInstance()->getMysqliConnection();
 $error = null;
 $postId = isset($_GET['id']) ? intval($_GET['id']) : 0;
+
 
 $availableStatusOptions = [];
 $statusFieldResult = $mysqli->query("SHOW COLUMNS FROM tbl_new LIKE 'New_Status'");
@@ -19,6 +21,7 @@ if ($statusFieldResult) {
         }
     }
 }
+
 
 $hasCategoryField = false;
 $hasViewField = false;
@@ -34,6 +37,7 @@ if ($columnsResult) {
     }
 }
 
+
 $news = [
     'New_Title' => '',
     'New_Description' => '',
@@ -43,11 +47,14 @@ $news = [
     'New_Category' => 'Movie',
 ];
 
+
 $allowedCategories = ['Movie', 'Actor'];
+
 
 if ($postId <= 0) {
     $error = 'ID bài viết không hợp lệ.';
 }
+
 
 if (!$error && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $news['New_Title'] = trim($_POST['New_Title'] ?? '');
@@ -58,6 +65,7 @@ if (!$error && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $news['New_Category'] = in_array($_POST['New_Category'] ?? 'Movie', $allowedCategories, true) ? $_POST['New_Category'] : 'Movie';
     }
     $news['New_Status'] = in_array($_POST['New_Status'] ?? $news['New_Status'], $availableStatusOptions, true) ? $_POST['New_Status'] : $news['New_Status'];
+
 
     if ($news['New_Title'] === '' || $news['New_Content'] === '') {
         $error = 'Tiêu đề và nội dung là bắt buộc.';
@@ -71,13 +79,16 @@ if (!$error && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $news['New_Status'],
         ];
 
+
         if ($hasCategoryField) {
             $fieldsToUpdate[] = 'New_Category = ?';
             $values[] = $news['New_Category'];
         }
 
+
         $values[] = $postId;
         $types = 'sssss' . ($hasCategoryField ? 's' : '') . 'i';
+
 
         $sql = 'UPDATE tbl_new SET ' . implode(', ', $fieldsToUpdate) . ' WHERE New_ID = ?';
         $stmt = $mysqli->prepare($sql);
@@ -88,6 +99,7 @@ if (!$error && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 $tmp[$key] = &$bindParams[$key];
             }
             call_user_func_array([$stmt, 'bind_param'], $tmp);
+
 
             if ($stmt->execute()) {
                 header('Location: index.php?controller=admin&action=detailpost&id=' . $postId);
@@ -100,6 +112,7 @@ if (!$error && $_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
 
 if (!$error && $_SERVER['REQUEST_METHOD'] !== 'POST') {
     $sql = "SELECT * FROM tbl_new WHERE New_ID = ? LIMIT 1";
@@ -119,6 +132,7 @@ if (!$error && $_SERVER['REQUEST_METHOD'] !== 'POST') {
         $error = 'Lỗi truy vấn bài viết.';
     }
 }
+
 
 function escape($value) {
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
@@ -287,3 +301,7 @@ function escape($value) {
     </div>
 </body>
 </html>
+
+
+
+

@@ -35,15 +35,19 @@ class Director{
             }
             $director_id = (int)$director_id;
 
+
             $sql = "CALL sp_GetMoviesByDirector(:director_id)";
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':director_id', $director_id, PDO::PARAM_INT);
             $stmt->execute();
 
+
             $data = $stmt->fetchAll(PDO::FETCH_OBJ);
             $stmt->closeCursor();
 
+
             return $data ?: [];
+
 
         } catch (PDOException $e) {
             error_log($e->getMessage());
@@ -52,3 +56,7 @@ class Director{
     }
 }
 ?>
+
+
+
+

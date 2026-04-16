@@ -3,21 +3,26 @@
 <?php endif; ?>
 <?php
 
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
 
 if (!isset($_SESSION['user_obj'])) {
     die("Bạn chưa đăng nhập hoặc mất session");
 }
 
+
 $accountId = $_SESSION['user_obj']->getId(); // hoặc property tùy class
 require_once __DIR__ . '/../../../Config/config.php';
 require_once __DIR__ . '/../../../Config/database.php';
 
+
 $mysqli = Database::getInstance()->getMysqliConnection();
 $error = null;
 $success = null;
+
 
 $availableStatusOptions = [];
 $statusFieldResult = $mysqli->query("SHOW COLUMNS FROM tbl_new LIKE 'New_Status'");
@@ -33,6 +38,7 @@ if ($statusFieldResult) {
     }
 }
 
+
 $news = [
     'New_Title' => '',
     'New_Description' => '',
@@ -42,7 +48,9 @@ $news = [
     'New_Status' => !empty($availableStatusOptions) ? $availableStatusOptions[0] : 'Publish',
 ];
 
+
 $allowedCategories = ['Movie', 'Actor'];
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $news['New_Title'] = trim($_POST['New_Title'] ?? '');
@@ -51,6 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $news['New_Img'] = trim($_POST['New_Img'] ?? '');
     $news['New_Category'] = in_array($_POST['New_Category'] ?? 'Movie', $allowedCategories, true) ? $_POST['New_Category'] : 'Movie';
     $news['New_Status'] = in_array($_POST['New_Status'] ?? $news['New_Status'], $availableStatusOptions, true) ? $_POST['New_Status'] : $news['New_Status'];
+
 
     if ($news['New_Title'] === '' || $news['New_Content'] === '') {
         $error = 'Tiêu đề và nội dung là bắt buộc.';
@@ -63,8 +72,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+
         $insertFields = ['New_Title', 'New_Description', 'New_Content', 'New_Img', 'New_Status', 'New_PublishDate', 'Account_ID'];
         $currentAccountId = $_SESSION['user_obj']->getId();
+
 
             $insertValues = [
                 $news['New_Title'],
@@ -76,6 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $currentAccountId,
             ];
 
+
         if (in_array('New_Category', $tableColumns, true)) {
             $insertFields[] = 'New_Category';
             $insertValues[] = $news['New_Category'];
@@ -84,6 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $insertFields[] = 'New_View';
             $insertValues[] = 0;
         }
+
 
         $placeholders = implode(', ', array_fill(0, count($insertFields), '?'));
         $fieldList = implode(', ', $insertFields);
@@ -96,6 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+
         $sql = "INSERT INTO tbl_new ({$fieldList}) VALUES ({$placeholders})";
         $stmt = $mysqli->prepare($sql);
         if ($stmt) {
@@ -106,6 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             call_user_func_array([$stmt, 'bind_param'], $tmp);
 
+
             if ($stmt->execute()) {
                 $insertedId = $stmt->insert_id;
                 header('Location: index.php?controller=admin&action=detailpost&id=' . (int) $insertedId);
@@ -114,6 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 die("SQL ERROR: " . $stmt->error);
             }
 
+
             $error = 'Không thể lưu bài viết. Vui lòng thử lại.';
             $stmt->close();
         } else {
@@ -121,6 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
 
 function escape($value) {
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
@@ -285,3 +302,7 @@ function escape($value) {
     </div>
 </body>
 </html>
+
+
+
+
