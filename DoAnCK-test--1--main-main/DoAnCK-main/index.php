@@ -1,12 +1,16 @@
 <?php
 
+
 require_once 'App/Models/MonUkou/Account.php';
 session_start();
+
 
 require_once 'Config/database.php';
 require_once 'Config/config.php';
 
+
 ob_start();
+
 
 // 🔥 DEBUG SEARCH - THÊM VÀO ĐẦU FILE index.php (sau ob_start())
 if (isset($_GET['controller']) && $_GET['controller'] === 'search') {
@@ -23,14 +27,18 @@ if (!isset($_SESSION['user_obj'])) {
     }
 }
 
+
 try {
+
 
     $controller = $_GET['controller'] ?? 'home';
     $action = $_GET['action'] ?? 'index';
     $page = $_GET['page'] ?? 1;
     $id = $_GET['id'] ?? 0;
 
+
     switch ($controller) {
+
 
         // ================= ADMIN =================
         // THAY THẾ case 'admin' trong index.php:
@@ -38,11 +46,13 @@ case 'admin':
     require_once 'App/Controllers/MonUkou/AdminController.php';
     $ctrl = new \App\Controllers\MonUkou\AdminController();
 
+
     // Kiểm tra quyền admin
     if (!isset($_SESSION['user_obj']) || $_SESSION['user_obj']->getRole() != 1) {
         header("Location: index.php");
         exit;
     }
+
 
     switch($action) {
         case 'dashboard':
@@ -63,10 +73,12 @@ case 'admin':
     }
     break;
 
+
         // ================= ACCOUNT =================
         case 'account':
             require_once 'App/Controllers/MonUkou/AccountController.php';
             $ctrl = new \App\Controllers\MonUkou\AccountController();
+
 
             if ($action === 'login') {
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -83,20 +95,24 @@ case 'admin':
             }
             break;
 
+
         // ================= HOME =================
         case 'home':
             require_once 'App/Controllers/PNem06/HomeController.php';
             $ctrl = new HomeController(Database::getInstance()->getConnection());
+
 
             if ($action === 'movies') $ctrl->movies($page);
             elseif ($action === 'actors') $ctrl->actors($page);
             else $ctrl->index($page);
             break;
 
+
         // ================= MOVIE =================
         case 'movie':
             require_once 'App/Controllers/birb109/MovieController.php';
             $ctrl = new MovieController(Database::getInstance()->getConnection());
+
 
             if ($action === 'detail' || $action === 'showDetail') {  // ✅ HỖ TRỢ CẢ 2
                 $ctrl->showDetail($id);
@@ -104,6 +120,7 @@ case 'admin':
                 $ctrl->index($page);
             }
             break;
+
 
         // ================= ACTOR =================
         case 'actor':
@@ -116,10 +133,12 @@ case 'admin':
     }
     break;
 
+
     // ================= NEWS =================
     case 'news':
         require_once 'App/Controllers/TNhu2006/NewsController.php';
         $ctrl = new NewsController();
+
 
         if ($action === 'showDetail') {
             $ctrl->showDetail($id);
@@ -128,11 +147,14 @@ case 'admin':
         }
         break;
 
+
     // ================= COMMENT =================
+
 
     case 'comment':
     require_once 'App/Controllers/TNhu2006/CommentController.php';
     $ctrl = new CommentController();
+
 
     if ($action === 'add') {
         $ctrl->addComment();
@@ -144,6 +166,7 @@ case 'admin':
 case 'search':
     require_once 'App/Controllers/TNhu2006/SearchController.php';
     $ctrl = new \App\Controllers\TNhu2006\SearchController();
+
 
     if ($action === 'ajax') {
         $ctrl->ajax();
@@ -158,11 +181,14 @@ case 'search':
             break;
     }
 
+
 } catch (Exception $e) {
     echo "<div class='alert alert-danger'>Lỗi: " . $e->getMessage() . "</div>";
 }
 
+
 $content = ob_get_clean();
+
 
 // 🔥 FIX AJAX: nếu là comment thì KHÔNG load layout
 if (($controller ?? '') === 'comment') {
@@ -170,8 +196,11 @@ if (($controller ?? '') === 'comment') {
     return;
 }
 
+
 if (($controller ?? '') === 'account' && ($action ?? '') === 'login') {
     echo $content;
 } else {
     include 'App/Views/Member/layouts/main.php';
 }
+
+

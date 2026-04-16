@@ -21,6 +21,7 @@ if (!$news) {
                     </div>
                 </header>
 
+
                 <?php if (!empty($news['New_Img'])): ?>
                 <div class="text-center mb-5">
                     <img src="uploads/news/<?= htmlspecialchars($news['New_Img']) ?>"
@@ -30,12 +31,14 @@ if (!$news) {
                 </div>
                 <?php endif; ?>
 
+
                 <div class="news-content fs-5 lh-lg" style="line-height: 1.8; color: #333;">
                     <?= nl2br($news['New_Content']) ?>
                 </div>
             </article>
         </div>
     </div>
+
 
     <!-- Comments Section -->
     <div class="row justify-content-center mb-5">
@@ -70,6 +73,7 @@ if (!$news) {
                 </div>
                 <?php endif; ?>
 
+
                 <!-- 🔥 FIX CHÍNH - DÒNG 106 -->
                 <div class="card-body p-0" style="max-height: 500px; overflow-y: auto;">
                     <?php if (empty($comments)): ?>
@@ -102,6 +106,7 @@ if (!$news) {
         </div>
     </div>
 
+
     <!-- Related News -->
     <?php if (!empty($relatedNews)): ?>
     <div class="row justify-content-center">
@@ -130,6 +135,7 @@ if (!$news) {
     <?php endif; ?>
 </div>
 
+
 <style>
 .bg-gradient { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important; }
 .hover-bg-light:hover { background-color: #f8f9fa !important; }
@@ -141,13 +147,16 @@ if (!$news) {
 document.getElementById("commentForm")?.addEventListener("submit", function(e){
     e.preventDefault();
 
+
     let content = document.getElementById("commentContent").value.trim();
     let newsId = document.getElementById("newsId").value;
+
 
     if (!content) {
         alert("Nhập nội dung đi bro 😅");
         return;
     }
+
 
     fetch("index.php?controller=comment&action=add", {
     method: "POST",
@@ -160,6 +169,7 @@ document.getElementById("commentForm")?.addEventListener("submit", function(e){
 .then(text => {
     console.log("RAW RESPONSE:", text); // 👈 xem lỗi tại đây
 
+
     let data;
     try {
         data = JSON.parse(text);
@@ -168,7 +178,9 @@ document.getElementById("commentForm")?.addEventListener("submit", function(e){
         return;
     }
 
+
     if (data.success) {
+
 
         let html = `
         <div class="p-4 border-bottom">
@@ -184,10 +196,13 @@ document.getElementById("commentForm")?.addEventListener("submit", function(e){
             </div>
         </div>`;
 
+
         document.querySelector(".card-body.p-0")
             .insertAdjacentHTML("afterbegin", html);
 
+
         document.getElementById("commentContent").value = "";
+
 
     } else {
         alert(data.message);
@@ -196,3 +211,5 @@ document.getElementById("commentForm")?.addEventListener("submit", function(e){
     });
 ;
 </script>
+
+
