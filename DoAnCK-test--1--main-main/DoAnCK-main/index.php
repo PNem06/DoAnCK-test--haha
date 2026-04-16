@@ -184,7 +184,7 @@ case 'search':
 
 } catch (Exception $e) {
     echo "<div class='alert alert-danger'>Lỗi: " . $e->getMessage() . "</div>";
-}
+} 
 
 
 $content = ob_get_clean();
