@@ -1,9 +1,11 @@
 <?php
 require_once __DIR__ . '/../../../Config/database.php';
 
+
 class Movie {
     private $conn;
     private $table_name = "tbl_movie";
+
 
     private $Movie_ID;
     private $Movie_Title;
@@ -17,11 +19,13 @@ class Movie {
     private $Actor_ID;
     private $Account_ID;  
 
+
     public function __construct() {
     $this->conn = Database::getInstance()->getConnection();
 }
 
-    // Setter 
+
+    // Setter
     public function setMovie($id, $title, $desc=null, $img, $genre_id, $relDate=null, $streamDate = null, $studio_id, $director_id, $actor_id, $account_id) {  
         $this->Movie_ID = $id;
         $this->Movie_Title = $title;
@@ -36,30 +40,37 @@ class Movie {
         $this->Account_ID = $account_id;  
     }
 
-    // Getter methods 
+
+    // Getter methods
     public function getMovie_ID() {
         return $this->Movie_ID;
     }
+
 
     public function getMovie_Title() {
         return htmlspecialchars($this->Movie_Title);
     }
 
+
     public function getMovie_Description() {
         return nl2br(htmlspecialchars($this->Movie_Description));
     }
+
 
     public function getMovie_Img() {
         return !empty($this->Movie_Img) ? $this->Movie_Img : 'default-movie.jpg';
     }
 
+
     public function getGenre_ID() {
         return $this->Genre_ID;
     }
 
+
     public function getGenreArray() {
         return explode(',', $this->Genre_ID);
     }
+
 
     public function getMovie_ReleaseDate($format = 'Y-m-d') {
         if($this->Movie_ReleaseDate) {
@@ -68,6 +79,7 @@ class Movie {
         return null;
     }
 
+
     public function getMovie_StreamingDate($format = 'Y-m-d') {
         if($this->Movie_StreamingDate) {
             return date($format, strtotime($this->Movie_StreamingDate));
@@ -75,35 +87,43 @@ class Movie {
         return null;
     }
 
+
     public function getStudio_ID() {
         return $this->Studio_ID;
     }
+
 
     public function getStudioArray() {
         return explode(',', $this->Studio_ID);
     }
 
+
     public function getDirector_ID() {
         return $this->Director_ID;
     }
+
 
     public function getDirectorArray() {
         return explode(',', $this->Director_ID);
     }
 
+
     public function getActor_ID() {
         return $this->Actor_ID;
     }
+
 
     public function getActorArray() {
         return explode(',', $this->Actor_ID);
     }
 
+
     public function getAccount_ID() {
         return $this->Account_ID;
     }
 
-    // Chi tiết phim 
+
+    // Chi tiết phim
     public function getDetails() {
         $query = "SELECT m.*, s.Studio_Name, s.Studio_Info, d.Director_Name, d.Director_Info, a.Username, a.Account_img
                   FROM " . $this->table_name . " m
@@ -123,6 +143,7 @@ class Movie {
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
         $stmt->closeCursor(); // 🔥 bắt buộc khi dùng SP
 
+
         return $data;
     } catch (PDOException $e) {
         error_log($e->getMessage());
@@ -137,6 +158,7 @@ class Movie {
     return $data;
 }
 
+
 public function getStudiosByMovie($movie_id) {
     $stmt = $this->conn->prepare("CALL sp_GetStudiosByMovie(?)");
     $stmt->execute([$movie_id]);
@@ -145,20 +167,22 @@ public function getStudiosByMovie($movie_id) {
     return $data;
 }
 
+
     public function getGenresByMovie($movie_id) {
     $stmt = $this->conn->prepare("CALL sp_GetGenresByMovie(?)");
     $stmt->execute([$movie_id]);
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $stmt->closeCursor();
 
+
     return $data;
 }
     // Search phim theo ten gan dung
     public function searchMovies($keyword) {
-        $query = "SELECT m.*, s.Studio_Name 
+        $query = "SELECT m.*, s.Studio_Name
                   FROM " . $this->table_name . " m
                   LEFT JOIN tbl_studio s ON m.Studio_ID = s.Studio_ID
-                  WHERE m.Movie_Title LIKE :keyword 
+                  WHERE m.Movie_Title LIKE :keyword
                      OR m.Movie_Description LIKE :keyword
                   ORDER BY m.Movie_ReleaseDate DESC";
         $stmt = $this->conn->prepare($query);
@@ -167,6 +191,7 @@ public function getStudiosByMovie($movie_id) {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
     // Lấy thể loại của phim
     public function getGenres() {
@@ -180,6 +205,7 @@ public function getStudiosByMovie($movie_id) {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
     // Lọc phim theo thể loại
     public function getMovieByGenre($genre_id) {
         $query = "SELECT m.* FROM " . $this->table_name . " m
@@ -191,9 +217,10 @@ public function getStudiosByMovie($movie_id) {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
     // Lấy danh sách diễn viên của phim
     public function getActors() {
-        $query = "SELECT a.*, c.Character_Name 
+        $query = "SELECT a.*, c.Character_Name
                   FROM htbl_actor a
                   INNER JOIN tbl_charactor c ON a.Actor_ID = c.Actor_ID
                   WHERE c.Movie_ID = :id";
@@ -203,9 +230,10 @@ public function getStudiosByMovie($movie_id) {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
     // Lấy bình luận về phim
     public function getComments() {
-        $query = "SELECT c.*, a.Username, a.Account_img 
+        $query = "SELECT c.*, a.Username, a.Account_img
                   FROM tbl_comment c
                   INNER JOIN tbl_account a ON c.Account_ID = a.Account_ID
                   WHERE c.Movie_ID = :id
@@ -215,6 +243,7 @@ public function getStudiosByMovie($movie_id) {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
     // Phương thức tiện ích: lấy tất cả
     public function getAllData() {
@@ -234,6 +263,7 @@ public function getStudiosByMovie($movie_id) {
         ];
     }
 
+
     // sp_GetAllMovies()
     public function getAllMovies(): array {
         try {
@@ -246,6 +276,7 @@ public function getStudiosByMovie($movie_id) {
         }
     }
 
+
     // sp_SearchMovieByName(IN keyword VARCHAR(128))
     public function searchMovieByName(string $keyword): array {
         try {
@@ -257,6 +288,7 @@ public function getStudiosByMovie($movie_id) {
             return [];
         }
     }
+
 
     // sp_AddMovie() - 10 parameters theo SP definition
     public function addMovie(array $data): bool {
@@ -280,6 +312,7 @@ public function getStudiosByMovie($movie_id) {
         }
     }
 
+
     // sp_GetLatestMovies()
     public function getLatestMovies(): array {
         try {
@@ -291,6 +324,7 @@ public function getStudiosByMovie($movie_id) {
             return [];
         }
     }
+
 
     // sp_TopMoviesByViews(IN p_Limit INT)
     public function getTopMoviesByViews(int $limit = 10): array {
@@ -308,8 +342,10 @@ public function getStudiosByMovie($movie_id) {
         $stmt = $this->conn->prepare("CALL sp_GetActorsByMovie(?)");
         $stmt->execute([$movie_id]);
 
+
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $stmt->closeCursor(); // 🔥 bắt buộc khi dùng SP
+
 
         return $data;
     } catch (PDOException $e) {
@@ -323,14 +359,14 @@ public function getStudiosByMovie($movie_id) {
 // ✅ THÊM VÀO class Movie - SỬA $this->conn thay vì $this->db
 public function getActorsByMovieWithCount($movie_id) {
     try {
-        $sql = "SELECT a.*, 
+        $sql = "SELECT a.*,
                        (SELECT COUNT(*) FROM tbl_character c WHERE c.Actor_ID = a.Actor_ID) as movie_count
                 FROM tbl_character c
                 JOIN tbl_actor a ON c.Actor_ID = a.Actor_ID
                 WHERE c.Movie_ID = ?
                 GROUP BY a.Actor_ID
                 ORDER BY a.Actor_Name";
-        
+       
         $stmt = $this->conn->prepare($sql);  // ✅ $this->conn thay vì $this->db
         $stmt->execute([intval($movie_id)]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -340,3 +376,7 @@ public function getActorsByMovieWithCount($movie_id) {
     }
 }}
 ?>
+
+
+
+

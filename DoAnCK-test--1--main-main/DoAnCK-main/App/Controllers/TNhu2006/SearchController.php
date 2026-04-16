@@ -1,30 +1,37 @@
 <?php
 namespace App\Controllers\TNhu2006;
 
+
 require_once __DIR__ . '/../../../Config/database.php';
+
 
 class SearchController {
     private $mysqli;
+
 
     public function __construct() {
         $this->mysqli = \Database::getInstance()->getMysqliConnection();
     }
 
+
     public function ajax() {
     if (ob_get_level()) ob_clean();
     header('Content-Type: application/json; charset=utf-8');
     header('Access-Control-Allow-Origin: *');
-    
+   
     $context = $_GET['context'] ?? 'global';
     $keyword = trim($_GET['keyword'] ?? '');
+
 
     if (empty($keyword)) {
         echo json_encode([]);
         exit;
     }
 
+
     $like = '%' . $keyword . '%';
     $results = [];
+
 
     try {
         // 🔥 CASE TRANG CHỦ: TẤT CẢ
@@ -56,6 +63,7 @@ class SearchController {
             $results = $this->searchNewsByCategory($like, 10);
         }
 
+
         echo json_encode($results, JSON_UNESCAPED_UNICODE);
     } catch (Exception $e) {
         echo json_encode(['error' => $e->getMessage()]);
@@ -65,14 +73,14 @@ class SearchController {
 // 🔥 SEARCH NEWS THEO CATEGORY (TIN PHIM/TIN SAO)
 private function searchNewsByCategory($like, $limit = 10) {
     $results = [];
-    $sql = "SELECT New_ID, New_Title, New_Category FROM tbl_new 
-            WHERE New_Title LIKE ? AND New_Status = 'Publish' 
+    $sql = "SELECT New_ID, New_Title, New_Category FROM tbl_new
+            WHERE New_Title LIKE ? AND New_Status = 'Publish'
             ORDER BY New_PublishDate DESC LIMIT ?";
     $stmt = $this->mysqli->prepare($sql);
     $stmt->bind_param("si", $like, $limit);
     $stmt->execute();
     $res = $stmt->get_result();
-    
+   
     while ($row = $res->fetch_assoc()) {
         $type = $row['New_Category'] === 'Actor' ? '📰 Tin sao' : '📰 Tin phim';
         $results[] = [
@@ -84,6 +92,7 @@ private function searchNewsByCategory($like, $limit = 10) {
     return $results;
 }
 
+
     // 🔥 MOVIES SEARCH
     private function searchMovies($like, $limit = 10) {
         $results = [];
@@ -92,16 +101,17 @@ private function searchNewsByCategory($like, $limit = 10) {
         $stmt->bind_param("si", $like, $limit);
         $stmt->execute();
         $res = $stmt->get_result();
-        
+       
         while ($row = $res->fetch_assoc()) {
             $results[] = [
                 "title" => $row['Movie_Title'],
-                "type" => "🎬 Phim", 
+                "type" => "🎬 Phim",
                 "link" => "index.php?controller=movie&action=showDetail&id=" . $row['Movie_ID']
             ];
         }
         return $results;
     }
+
 
     // 🔥 ACTORS SEARCH  
     private function searchActors($like, $limit = 10) {
@@ -111,7 +121,7 @@ private function searchNewsByCategory($like, $limit = 10) {
         $stmt->bind_param("si", $like, $limit);
         $stmt->execute();
         $res = $stmt->get_result();
-        
+       
         while ($row = $res->fetch_assoc()) {
             $results[] = [
                 "title" => $row['Actor_Name'],
@@ -122,6 +132,7 @@ private function searchNewsByCategory($like, $limit = 10) {
         return $results;
     }
 
+
     // 🔥 NEWS SEARCH
     private function searchNews($like, $limit = 10) {
         $results = [];
@@ -130,7 +141,7 @@ private function searchNewsByCategory($like, $limit = 10) {
         $stmt->bind_param("si", $like, $limit);
         $stmt->execute();
         $res = $stmt->get_result();
-        
+       
         while ($row = $res->fetch_assoc()) {
             $results[] = [
                 "title" => $row['New_Title'],
@@ -142,3 +153,5 @@ private function searchNewsByCategory($like, $limit = 10) {
     }
 }
 ?>
+
+

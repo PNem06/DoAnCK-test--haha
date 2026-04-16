@@ -1,21 +1,25 @@
 <?php
 require_once 'config.php';
 
+
 class Studio {
     private $conn;
     private $table_name = "tbl_studio";
+
 
     private $Studio_ID;
     private $Studio_Name;
     private $Studio_Info;
     private $Studio_Social;  
 
+
     public function __construct() {
         $database = new Database();
         $this->conn = $database->getConnection();
     }
 
-    // Setter 
+
+    // Setter
     public function setStudio($id, $name, $info = null, $social = null) {
         $this->Studio_ID = $id;
         $this->Studio_Name = $name;
@@ -23,26 +27,32 @@ class Studio {
         $this->Studio_Social = $social;  
     }
 
+
     // Getter methods
     public function getStudio_ID() {
         return $this->Studio_ID;
     }
 
+
     public function getStudio_Name() {
         return htmlspecialchars($this->Studio_Name);
     }
+
 
     public function getStudio_Info() {
         return nl2br(htmlspecialchars($this->Studio_Info));
     }
 
+
     public function getStudio_Info_Short($length = 100) {
         return substr(htmlspecialchars($this->Studio_Info), 0, $length) . '...';
     }
 
+
     public function getStudio_Social() {
         return htmlspecialchars($this->Studio_Social);
     }
+
 
     public function getStudio_Social_Url() {
         if(!empty($this->Studio_Social)) {
@@ -55,6 +65,7 @@ class Studio {
         return null;
     }
 
+
     // Lấy tất cả hãng sản xuất
     public function getAllStudios() {
         $query = "SELECT * FROM " . $this->table_name . " ORDER BY Studio_Name";
@@ -62,6 +73,7 @@ class Studio {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
     // Lấy thông tin chi tiết hãng
     public function getDetails() {
@@ -72,16 +84,18 @@ class Studio {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+
     // Lấy danh sách phim của hãng
     public function getProducedMovies() {
-        $query = "SELECT * FROM tbl_movie 
-                  WHERE Studio_ID = :id 
+        $query = "SELECT * FROM tbl_movie
+                  WHERE Studio_ID = :id
                   ORDER BY Movie_ReleaseDate DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $this->Studio_ID);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
     // Tìm kiếm studio theo tên
     public function searchByName($keyword) {
@@ -92,6 +106,7 @@ class Studio {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
     // Phương thức tiện ích: lấy tất cả
     public function getAllData() {
@@ -117,3 +132,7 @@ class Studio {
     }
 }
 ?>
+
+
+
+

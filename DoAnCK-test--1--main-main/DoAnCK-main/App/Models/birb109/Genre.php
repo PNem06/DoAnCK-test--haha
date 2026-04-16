@@ -1,17 +1,21 @@
 <?php
 require_once 'config.php';
 
+
 class Genre {
     private $conn;
     private $table_name = "tbl_genre";
 
+
     private $Genre_ID;
     private $Genre_Name;
+
 
     public function __construct() {
         $database = new Database();
         $this->conn = $database->getConnection();
     }
+
 
     // Setter method
     public function setGenre($id, $name) {
@@ -19,14 +23,17 @@ class Genre {
         $this->Genre_Name = $name;
     }
 
+
     // Getter methods
     public function getGenre_ID() {
         return $this->Genre_ID;
     }
 
+
     public function getGenre_Name() {
         return $this->Genre_Name;
     }
+
 
     // Lấy tất cả thể loại
     public function getAllGenres() {
@@ -45,6 +52,7 @@ class Genre {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
     // Lấy thông tin chi tiết thể loại
     public function getDetails() {
         $query = "SELECT * FROM " . $this->table_name . " WHERE Genre_ID = :id";
@@ -54,7 +62,8 @@ class Genre {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // sp_GetMoviesByGenre 
+
+    // sp_GetMoviesByGenre
     public function getMoviesByGenre(int $genreId): array {
         try {
             $stmt = $this->pdo->prepare("CALL sp_GetMoviesByGenre(?)");
@@ -67,3 +76,7 @@ class Genre {
     }
 }
 ?>
+
+
+
+
